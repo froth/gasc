@@ -14,27 +14,42 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
-user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0'
-#user_agent = 'Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.7) Gecko/2009021910 Firefox/3.0.7'
-urltemplate = 'https://www.google.de/search?q=%22{name}%22&lr=lang_de&safe=off&as_qdr=all&sa=X&ei=wmefUebRD6jL4ASu-YHQDw&ved=0CCMQpwUoBg&source=lnt&tbs=lr%3Alang_1de%2Ccdr%3A1%2Ccd_min%3A{mindate}%2Ccd_max%3A{maxdate}&tbm='
-url = urltemplate.format(name='Roth',mindate='1.1.2000',maxdate='1.3.2013')
-#print(url)
-headers={'User-Agent':user_agent,}
 import urllib.request
+import urllib.parse
 import re
+import csv
 from bs4 import BeautifulSoup
 
-request = urllib.request.Request(url,None,headers)
-response = urllib.request.urlopen(request)
+user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0'
+headers={'User-Agent':user_agent,}
+urltemplate = 'https://www.google.de/search?q=%22{name}%22&lr=lang_de&safe=off&as_qdr=all&sa=X&ei=wmefUebRD6jL4ASu-YHQDw&ved=0CCMQpwUoBg&source=lnt&tbs=lr%3Alang_1de%2Ccdr%3A1%2Ccd_min%3A{mindate}%2Ccd_max%3A{maxdate}&tbm='
 
-html = response.read()
-soup = BeautifulSoup(html)
-result = soup.find(id="resultStats")
-if result != None:
-    resultString = result.getText()
-    print(resultString)
-    m = re.search('([0-9.]+) ', resultString)
-    dotnumber = m.group(1)
-    plainnumber = dotnumber.replace('.', '')
-    print(plainnumber)
+searchterms = [urllib.parse.quote(line.strip()) for line in open('searchterm')]
+timeranges = [line.split() for line in open('timeranges')]
 
+outfile = open( 'results.csv', "w" )
+writer = csv.writer( outfile )
+header = ['Player']
+for r in timeranges:
+    header.append(r[0] + '-' + r[1])
+writer.writerow(header)
+for term in searchterms:
+    row = [term]
+    for timerange in timeranges:
+        url = urltemplate.format(name=term, mindate=timerange[0], maxdate=timerange[1])
+        print(url)
+
+        request = urllib.request.Request(url,None,headers)
+        response = urllib.request.urlopen(request)
+
+        html = response.read()
+        soup = BeautifulSoup(html)
+        result = soup.find(id="resultStats")
+        if result != None:
+            resultString = result.getText()
+            m = re.search('([0-9.]+) ', resultString)
+            dotnumber = m.group(1)
+            plainnumber = dotnumber.replace('.', '')
+            counts.push(plainnumber)
+    writer.writerow(row)
+outfile.close()
