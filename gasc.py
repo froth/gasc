@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 
 user_agent = 'Mozilla/5.0 (X11; Linux x86_64; rv:21.0) Gecko/20100101 Firefox/21.0'
 headers={'User-Agent':user_agent,}
-urltemplate = 'https://www.google.de/search?q=%22{name}%22&lr=lang_de&safe=off&as_qdr=all&sa=X&ei=wmefUebRD6jL4ASu-YHQDw&ved=0CCMQpwUoBg&source=lnt&tbs=lr%3Alang_1de%2Ccdr%3A1%2Ccd_min%3A{mindate}%2Ccd_max%3A{maxdate}&tbm='
+urltemplate = 'https://www.google.de/search?q=%22{name}%22&lr=lang_de&safe=off&as_qdr=all&sa=X&source=lnt&tbs=lr%3Alang_1de%2Ccdr%3A1%2Ccd_min%3A{mindate}%2Ccd_max%3A{maxdate}&tbm='
 
 searchterms = [urllib.parse.quote(line.strip()) for line in open('searchterm')]
 timeranges = [line.split() for line in open('timeranges')]
@@ -50,6 +50,6 @@ for term in searchterms:
             m = re.search('([0-9.]+) ', resultString)
             dotnumber = m.group(1)
             plainnumber = dotnumber.replace('.', '')
-            counts.push(plainnumber)
+            row.push(plainnumber)
     writer.writerow(row)
 outfile.close()
