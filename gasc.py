@@ -50,6 +50,6 @@ for term in searchterms:
             m = re.search('([0-9.]+) ', resultString)
             dotnumber = m.group(1)
             plainnumber = dotnumber.replace('.', '')
-            row.push(plainnumber)
+            row.append(plainnumber)
     writer.writerow(row)
 outfile.close()
