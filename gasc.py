@@ -30,7 +30,7 @@ urltemplate = (
     '%3A{mindate}%2Ccd_max%3A{maxdate}&tbm='
 )
 
-searchterms = [urllib.parse.quote(line.strip()) for line in open('searchterm')]
+searchterms = [line.strip() for line in open('searchterm')]
 timeranges = [line.split() for line in open('timeranges')]
 
 outfile = open('results.csv', "w")
@@ -43,7 +43,7 @@ for term in searchterms:
     row = [term]
     for timerange in timeranges:
         url = urltemplate.format(
-            name=term,
+            name=urllib.parse.quote(term),
             mindate=timerange[0],
             maxdate=timerange[1]
         )
